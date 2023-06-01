@@ -14,10 +14,7 @@ namespace EventsAPI.Controllers
         {
             this._context = context;
         }
-        public IActionResult Index()
-        {
-            return View();
-        }
+       
 
         [HttpGet]
         public IActionResult GetAll()
@@ -32,22 +29,43 @@ namespace EventsAPI.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(Guid id)
         {
+            var dEvent = _context.ListEvents.SingleOrDefault(e => e.Id == id);
 
+            if(dEvent == null) return NotFound();   
+
+            return Ok(dEvent);  
         }
 
         [HttpPost]
         public IActionResult Post(Event evento)
         {
+            _context.ListEvents.Add(evento);
 
+            //that is body response
+            return CreatedAtAction(nameof(GetById), new { id = evento.Id },evento);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(Guid id, Event evento)
+        public IActionResult Update(Guid id, Event input)
         {
+            var dEvent = _context.ListEvents.SingleOrDefault(e => e.Id == id);
 
+            if (dEvent == null) return NotFound();
+
+            dEvent.Update(input);
+
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id) { }
+        public IActionResult Delete(Guid id) {
+            var dEvent = _context.ListEvents.SingleOrDefault(e => e.Id == id);
+
+            if (dEvent == null) return NotFound();
+
+            dEvent.Delete();
+
+            return NoContent();
+        }
     }
 }
